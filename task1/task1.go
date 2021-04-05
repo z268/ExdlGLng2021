@@ -9,12 +9,12 @@ import (
 )
 
 func isAutomorphic(number int) bool {
-	sq_number := number * number
+	squaredNumber := number * number
 	divider := 10
 	for divider < number {
 		divider *= 10
 	}
-	return sq_number % divider == number
+	return squaredNumber% divider == number
 }
 
 func readNumber() (int, error) {

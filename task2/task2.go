@@ -12,22 +12,22 @@ const repeats_treshold = 4
 
 func pack(input string) string {
 	var (
-		prev_char rune
-		repeats   int
-		result    string
+		prevChar rune
+		repeats  int
+		result   string
 	)
 
 	flushRepeats := func(char rune) {
 		if repeats > repeats_treshold {
-			result += fmt.Sprintf("#%v#%c", repeats, prev_char)
+			result += fmt.Sprintf("#%v#%c", repeats, prevChar)
 		} else {
-			result += strings.Repeat(string(prev_char), repeats)
+			result += strings.Repeat(string(prevChar), repeats)
 		}
-		prev_char, repeats = char, 1
+		prevChar, repeats = char, 1
 	}
 
 	for _, char := range input {
-		if char == prev_char {
+		if char == prevChar {
 			repeats += 1
 		} else {
 			flushRepeats(char)
@@ -40,22 +40,22 @@ func pack(input string) string {
 
 func unpack(input_raw string) string {
 	var (
-		repeats_str, result string
-		inside_hashes       bool
+		repeatsStr, result string
+		isInsideHashes     bool
 	)
 
 	for _, char := range []rune(input_raw) {
 		if char == '#' {
-			inside_hashes = !inside_hashes
+			isInsideHashes = !isInsideHashes
 			continue
 		}
 
-		if (len(repeats_str) > 0) && !inside_hashes {
-			repeats, _ := strconv.Atoi(repeats_str)
+		if (len(repeatsStr) > 0) && !isInsideHashes {
+			repeats, _ := strconv.Atoi(repeatsStr)
 			result += strings.Repeat(string(char), repeats)
-			repeats_str = ""
-		} else if inside_hashes {
-			repeats_str += string(char)
+			repeatsStr = ""
+		} else if isInsideHashes {
+			repeatsStr += string(char)
 		} else {
 			result += string(char)
 		}
