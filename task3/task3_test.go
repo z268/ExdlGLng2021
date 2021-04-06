@@ -11,7 +11,7 @@ var data = map[string]string{
 
 func TestCounter(t *testing.T) {
 	for source, expected := range(data) {
-		result := getWordStats(source)
+		result := analyzeString(source)
 		if result != expected {
 			t.Fatalf("WordStat counting error of `%v`: `%v` != `%v`", source, result, expected)
 		}

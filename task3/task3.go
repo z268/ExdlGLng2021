@@ -57,7 +57,7 @@ func getStats(words []string) Stats {
 	return stats
 }
 
-func getWordStats(input string) string {
+func analyzeString(input string) string {
 	words := getWords(input)
 	stats := getStats(words)
 	stats.sort()
@@ -67,5 +67,5 @@ func getWordStats(input string) string {
 func main() {
 	fmt.Print("Enter string: ")
 	input, _ := bufio.NewReader(os.Stdin).ReadString('\n')
-	fmt.Println(getWordStats(input))
+	fmt.Println(analyzeString(input))
 }
