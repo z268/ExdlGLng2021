@@ -52,11 +52,12 @@ func findKey(encryptedWords, knownWords []string) (key int) {
 	variants := []int{}
 	for _, knownWord := range knownWords {
 		vector := getVector(knownWord)
-		encryptedWord := []rune(wordsByVector[vector])
-
-		for idx, knownChar := range(knownWord) {
-			key = int(normalize(encryptedWord[idx] - knownChar))
-			variants = append(variants, key)
+		if matchedEncryptedWord, ok := wordsByVector[vector]; ok {
+			for idx, knownChar := range(knownWord) {
+				encryptedChar := []rune(matchedEncryptedWord)[idx]
+				key = int(normalize(encryptedChar - knownChar))
+				variants = append(variants, key)
+			}
 		}
 	}
 
