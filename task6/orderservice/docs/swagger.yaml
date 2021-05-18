@@ -1,0 +1,148 @@
+basePath: /api/v1/
+definitions:
+  http.CreateOrderRequest:
+    properties:
+      book_uuid:
+        example: 01234567-89ab-cdef-0123-456789abcdef
+        type: string
+      description:
+        example: order description
+        type: string
+    type: object
+  http.ResponseError:
+    properties:
+      error:
+        type: string
+    type: object
+  http.UpdateOrderRequest:
+    properties:
+      description:
+        example: order description
+        type: string
+    type: object
+  repository.Order:
+    properties:
+      book_uuid:
+        example: 01234567-89ab-cdef-0123-456789abcdef
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      updated_at:
+        type: string
+      uuid:
+        example: 01234567-89ab-cdef-0123-456789abcdef
+        type: string
+    type: object
+host: localhost:8001
+info:
+  contact: {}
+  title: Book order service API
+  version: "0.1"
+paths:
+  /orders/:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/repository.Order'
+            type: array
+      summary: Get all orders
+      tags:
+      - Orders
+    post:
+      parameters:
+      - description: Order
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/http.CreateOrderRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/repository.Order'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Create new order
+      tags:
+      - Orders
+  /orders/{order_uuid}/:
+    delete:
+      parameters:
+      - description: Order UUID
+        in: path
+        name: order_uuid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Empty response
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Delete an order
+      tags:
+      - Orders
+    get:
+      parameters:
+      - description: Order UUID
+        in: path
+        name: order_uuid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/repository.Order'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Get order detail
+      tags:
+      - Orders
+    put:
+      parameters:
+      - description: Order UUID
+        in: path
+        name: order_uuid
+        required: true
+        type: string
+      - description: Order
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/http.UpdateOrderRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/repository.Order'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Update an order
+      tags:
+      - Orders
+swagger: "2.0"

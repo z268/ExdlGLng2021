@@ -1,0 +1,528 @@
+basePath: /api/v1/
+definitions:
+  http.AuthorRequest:
+    properties:
+      name:
+        example: Robert Martin
+        type: string
+    type: object
+  http.BookRequest:
+    properties:
+      author_uuid:
+        example: 01234567-89ab-cdef-0123-456789abcdef
+        type: string
+      name:
+        example: Clean code
+        type: string
+    type: object
+  http.CategoryRequest:
+    properties:
+      name:
+        example: Programming
+        type: string
+      parent_uuid:
+        example: 524ab1ae-3293-4e90-9458-88b61eb95f0d
+        type: string
+    type: object
+  http.PaginatedResults:
+    properties:
+      next:
+        example: ?page=5
+        type: string
+      page:
+        example: 4
+        type: integer
+      page_size:
+        example: 10
+        type: integer
+      previous:
+        example: ?page=3
+        type: string
+      results:
+        type: object
+    type: object
+  http.ResponseError:
+    properties:
+      error:
+        type: string
+    type: object
+  repository.Author:
+    properties:
+      created_at:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+      uuid:
+        type: string
+    type: object
+  repository.Book:
+    properties:
+      author_uuid:
+        example: 01234567-89ab-cdef-0123-456789abcdef
+        type: string
+      categories:
+        items:
+          $ref: '#/definitions/repository.Category'
+        type: array
+      created_at:
+        example: "2021-01-01T00:00:00Z"
+        type: string
+      name:
+        example: Clean code
+        type: string
+      updated_at:
+        example: "2021-01-01T00:00:00Z"
+        type: string
+      uuid:
+        example: 01234567-89ab-cdef-0123-456789abcdef
+        type: string
+    type: object
+  repository.Category:
+    properties:
+      created_at:
+        example: "2021-01-01T00:00:00Z"
+        type: string
+      name:
+        example: Programming
+        type: string
+      parent_uuid:
+        example: 01234567-89ab-cdef-0123-456789abcdef
+        type: string
+      updated_at:
+        example: "2021-01-01T00:00:00Z"
+        type: string
+      uuid:
+        example: 01234567-89ab-cdef-0123-456789abcdef
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Book catalog service API
+  version: "0.1"
+paths:
+  /authors/:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/repository.Author'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Get list of authors
+      tags:
+      - Authors
+    post:
+      parameters:
+      - description: Author
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/http.AuthorRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/repository.Author'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Create an author
+      tags:
+      - Authors
+  /authors/{author_uuid}/:
+    delete:
+      parameters:
+      - description: Author UUID
+        in: path
+        name: author_uuid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Empty response
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Delete an author
+      tags:
+      - Authors
+    get:
+      parameters:
+      - description: Author UUID
+        in: path
+        name: author_uuid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/repository.Author'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Get an author
+      tags:
+      - Authors
+    put:
+      parameters:
+      - description: Author UUID
+        in: path
+        name: author_uuid
+        required: true
+        type: string
+      - description: Author
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/http.AuthorRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/repository.Author'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Update an author
+      tags:
+      - Authors
+  /books/:
+    get:
+      parameters:
+      - description: page number
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: page_size
+        type: integer
+      - description: comma-separated uuids
+        in: query
+        name: categories
+        type: string
+      - description: comma-separated uuids
+        in: query
+        name: authors
+        type: string
+      - description: search by author name
+        in: query
+        name: category_name
+        type: string
+      - description: search by category name
+        in: query
+        name: author_name
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              allOf:
+              - $ref: '#/definitions/http.PaginatedResults'
+              - properties:
+                  results:
+                    items:
+                      $ref: '#/definitions/repository.Book'
+                    type: array
+                type: object
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Search books
+      tags:
+      - Books
+    post:
+      parameters:
+      - description: Book
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/http.BookRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/repository.Book'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Create a Book
+      tags:
+      - Books
+  /books/{book_uuid}/:
+    delete:
+      parameters:
+      - description: Book UUID
+        in: path
+        name: book_uuid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/repository.Book'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Delete a books
+      tags:
+      - Books
+    get:
+      parameters:
+      - description: Book UUID
+        in: path
+        name: book_uuid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/repository.Book'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Get a books
+      tags:
+      - Books
+    put:
+      parameters:
+      - description: Book UUID
+        in: path
+        name: book_uuid
+        required: true
+        type: string
+      - description: Book
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/http.BookRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/repository.Book'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Update a books
+      tags:
+      - Books
+  /books/{book_uuid}/categories/{category_uuid}/:
+    delete:
+      parameters:
+      - description: Book UUID
+        in: path
+        name: book_uuid
+        required: true
+        type: string
+      - description: Category UUID
+        in: path
+        name: category_uuid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Empty response
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Delete a book-category relation
+      tags:
+      - Books
+    post:
+      parameters:
+      - description: Book UUID
+        in: path
+        name: book_uuid
+        required: true
+        type: string
+      - description: Category UUID
+        in: path
+        name: category_uuid
+        required: true
+        type: string
+      responses:
+        "201":
+          description: Empty response
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Create a book-category relation
+      tags:
+      - Books
+  /categories/:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/repository.Category'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Get list of categories
+      tags:
+      - Categories
+    post:
+      parameters:
+      - description: Category
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/http.CategoryRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/repository.Category'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Create an category
+      tags:
+      - Categories
+  /categories/{category_uuid}/:
+    delete:
+      parameters:
+      - description: Category UUID
+        in: path
+        name: category_uuid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Empty response
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Delete a category
+      tags:
+      - Categories
+    get:
+      parameters:
+      - description: Category UUID
+        in: path
+        name: category_uuid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/repository.Category'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Get a category
+      tags:
+      - Categories
+    put:
+      parameters:
+      - description: Category UUID
+        in: path
+        name: category_uuid
+        required: true
+        type: string
+      - description: Category
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/http.CategoryRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/repository.Category'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ResponseError'
+      summary: Update a category
+      tags:
+      - Categories
+swagger: "2.0"

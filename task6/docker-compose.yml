@@ -1,0 +1,78 @@
+version: "3.5"
+
+# Base services
+x-catalog: &catalog
+  build:
+    context: ./catalogservice
+    dockerfile: ./build/Dockerfile
+  image: task6/catalogserivce
+  restart: "no"
+  depends_on:
+    - catalog_db
+  environment:
+    DB_DATABASE: catalog
+    DB_HOST: catalog_db
+    DB_USER: catalog
+    DB_PASSWORD: catalogPassword
+
+x-mysql: &mysql
+  image: mysql:8
+  command: --default-authentication-plugin=mysql_native_password
+  restart: always
+
+
+services:
+
+  ### Catalog service
+  catalog_http:
+    <<: *catalog
+    ports:
+      - "8090:8000"
+
+  catalog_grpc:
+    <<: *catalog
+    command: "./start_grpc.sh"
+    ports:
+      - "50051:50051"
+
+  catalog_db:
+    <<: *mysql
+    volumes:
+      - ./dbdata/catalog:/var/lib/mysql
+    ports:
+      - "3396:3306"
+    environment:
+      MYSQL_DATABASE: catalog
+      MYSQL_USER: catalog
+      MYSQL_PASSWORD: catalogPassword
+      MYSQL_ROOT_PASSWORD: rootPassword
+
+
+  ### Order Service
+  order_http:
+    build:
+      context: ./orderservice
+      dockerfile: ./build/Dockerfile
+    image: task6/orderserivce
+    restart: "no"
+    ports:
+      - "8091:8001"
+    depends_on:
+      - order_db
+    environment:
+      DB_DATABASE: order
+      DB_HOST: order_db
+      DB_USER: order
+      DB_PASSWORD: orderPassword
+
+  order_db:
+    <<: *mysql
+    volumes:
+      - ./dbdata/order:/var/lib/mysql
+    ports:
+      - "3397:3306"
+    environment:
+      MYSQL_DATABASE: order
+      MYSQL_USER: order
+      MYSQL_PASSWORD: orderPassword
+      MYSQL_ROOT_PASSWORD: rootPassword

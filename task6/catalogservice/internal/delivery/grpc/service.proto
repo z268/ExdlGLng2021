@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option go_package = "github.com/z268/ExdlGLng2021/task6/catalogservice/internal/delivery/grpc";
+
+service BookService {
+  rpc GetBookByUUID (GetBooksRequest) returns (GetBooksResponse) {}
+}
+
+message Book {
+  string name = 1;
+  string author = 2;
+}
+
+message GetBooksRequest {
+  repeated string book_uuid = 1;
+}
+
+message GetBooksResponse {
+  repeated Book book = 1;
+}
